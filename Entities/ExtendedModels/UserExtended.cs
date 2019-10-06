@@ -17,6 +17,9 @@ namespace Entities.ExtendedModels
         public string Email { get; set; }
 
         public IEnumerable<Reservation> Reservations { get; set; }
+        public IEnumerable<Timetable> Timetables { get; set; }
+        public IEnumerable<Service> Services { get; set; }
+        public IEnumerable<Article> Articles { get; set; }
 
         public UserExtended()
         {

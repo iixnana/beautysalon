@@ -7,5 +7,6 @@ namespace Contracts
 {
     public interface IServiceRepository :IRepositoryBase<Service>
     {
+        IEnumerable<Service> ServicesByReservation(int masterId);
     }
 }

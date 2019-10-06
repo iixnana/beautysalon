@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Contracts;
 using Entities;
@@ -12,6 +13,11 @@ namespace Repository
         public ServiceRepository(RepositoryContext repositoryContext) :base(repositoryContext)
         {
 
+        }
+
+        public IEnumerable<Service> ServicesByReservation(int masterId)
+        {
+            return FindByCondition(a => a.MasterId.Equals(masterId)).ToList();
         }
     }
 }

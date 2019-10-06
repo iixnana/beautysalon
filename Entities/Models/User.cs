@@ -31,9 +31,11 @@ namespace Entities.Models
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Phone number is required")]
+        [DataType(DataType.PhoneNumber, ErrorMessage = "Invalid phone number")]
         public string Phone { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
 
 
