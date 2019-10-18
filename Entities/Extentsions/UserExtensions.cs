@@ -17,6 +17,7 @@ namespace Entities.Extentsions
             dbUser.Password = user.Password;
             dbUser.Phone = user.Phone;
             dbUser.Email = user.Email;
+            dbUser.Token = user.Token;
         }
     }
 }

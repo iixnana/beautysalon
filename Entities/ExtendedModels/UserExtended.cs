@@ -15,6 +15,7 @@ namespace Entities.ExtendedModels
         public string Password { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
+        public string Token { get; set; }
 
         public IEnumerable<Reservation> Reservations { get; set; }
         public IEnumerable<Timetable> Timetables { get; set; }

@@ -14,5 +14,7 @@ namespace Contracts
         void CreateUser(User user);
         void UpdateUser(User dbUser, User user);
         void DeleteUser(User user);
+        //User Authenticate(string email, string password, string secret);
+        bool IsValidUser(string email, string password);
     }
 }

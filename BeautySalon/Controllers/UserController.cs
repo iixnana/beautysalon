@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Contracts;
 using Entities.Models;
 using Entities.Extentsions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using Helpers;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,11 +19,13 @@ namespace BeautySalon.Controllers
     {
         private ILoggerManager _logger;
         private IRepositoryWrapper _repository;
+        private readonly string _secret;
 
-        public UserController(ILoggerManager logger, IRepositoryWrapper repository)
+        public UserController(IOptions<AppSettings> appSettings, ILoggerManager logger, IRepositoryWrapper repository)
         {
             _logger = logger;
             _repository = repository;
+            _secret = appSettings.Value.Secret;
         }
 
         [HttpGet]
@@ -188,5 +193,18 @@ namespace BeautySalon.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
+        //[AllowAnonymous]
+        //[HttpPost("authenticate")]
+        //public IActionResult Authenticate([FromBody]User userParam)
+        //{
+        //    if (userParam == null) return BadRequest("Invalid client request");
+
+        //    var user = _repository.User.Authenticate(userParam.Email, userParam.Password, _secret);
+
+        //    if (user == null) return Unauthorized();
+
+        //    return Ok(user);
+        //}
     }
 }
