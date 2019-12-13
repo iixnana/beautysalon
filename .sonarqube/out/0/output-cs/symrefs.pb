@@ -1,0 +1,16 @@
+‰
+?C:\Users\Kamile\source\repos\BeautySalon\Helpers\AppSettings.cs
+
+ 
+
+ 
+
+ 
+
+		 
+
+
+
+ #
+
+ $

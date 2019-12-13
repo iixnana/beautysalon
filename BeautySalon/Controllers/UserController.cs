@@ -17,17 +17,20 @@ namespace BeautySalon.Controllers
     [Route("api/user")]
     public class UserController : Controller
     {
+        private readonly IAuthService _authService;
         private ILoggerManager _logger;
-        private IRepositoryWrapper _repository;
+        public IRepositoryWrapper _repository;
         private readonly string _secret;
 
-        public UserController(IOptions<AppSettings> appSettings, ILoggerManager logger, IRepositoryWrapper repository)
+        public UserController(IOptions<AppSettings> appSettings, ILoggerManager logger, IRepositoryWrapper repository, IAuthService authService)
         {
             _logger = logger;
             _repository = repository;
             _secret = appSettings.Value.Secret;
+            _authService = authService;
         }
 
+        [Authorize(Roles = Role.Admin)]
         [HttpGet]
         public IActionResult GetAllUsers()
         {
@@ -46,11 +49,41 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("masters")]
+        public IActionResult GetAllMasters()
+        {
+            try
+            {
+                var users = _repository.User.GetAllMasters();
+                foreach(User user in users)
+                {
+                    user.Password = null;
+                }
+
+                _logger.LogInfo($"Returned all masters from database.");
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetAllMasters action: {ex.Message}");
+                return NotFound();
+            }
+        }
+
+        [Authorize(Roles = Role.ClientMasterAdmin)]
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
             try
             {
+                if (!_authService.IsAdmin(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != id)
+                {
+                    _logger.LogError($"User with id: {id}, has tried to access restricted data in GetUserById.");
+                    return Unauthorized();
+                }
+
                 var user = _repository.User.GetUserById(id);
 
                 if (user.IsEmptyObject(id))
@@ -71,11 +104,18 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.ClientMasterAdmin)]
         [HttpGet("{id}/reservations")]
         public IActionResult GetUserWithDetails(int id)
         {
             try
             {
+                if (!_authService.IsAdmin(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != id)
+                {
+                    _logger.LogError($"User with id: {id}, has tried to access restricted data in GetUserById.");
+                    return Unauthorized();
+                }
+
                 var user = _repository.User.GetUserWithDetails(id);
 
                 if(user.IsEmptyObject(id))
@@ -96,6 +136,7 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public IActionResult CreateUser([FromBody]User user)
         {
@@ -128,11 +169,18 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.ClientMasterAdmin)]
         [HttpPut("{id}")]
         public IActionResult UpdateUser(int id, [FromBody]User user)
         {
             try
             {
+                if (!_authService.IsAdmin(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != id)
+                {
+                    _logger.LogError($"User with id: {id}, has tried to access restricted data in GetUserById.");
+                    return Unauthorized();
+                }
+
                 if (user.IsObjectNull())
                 {
                     _logger.LogError("User object sent from client is null.");
@@ -151,7 +199,7 @@ namespace BeautySalon.Controllers
                     _logger.LogError($"User with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
-
+                user.Id = id;
                 _repository.User.UpdateUser(dbUser, user);
                 _repository.Save();
 
@@ -164,11 +212,18 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.ClientMasterAdmin)]
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
             try
             {
+                if (!_authService.IsAdmin(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != id)
+                {
+                    _logger.LogError($"User with id: {id}, has tried to access restricted data in GetUserById.");
+                    return Unauthorized();
+                }
+
                 var user = _repository.User.GetUserById(id);
                 if (user.IsEmptyObject(id))
                 {
@@ -176,9 +231,9 @@ namespace BeautySalon.Controllers
                     return NotFound();
                 }
 
-                if (_repository.Reservation.ReservationsByUser(id).Any())
+                if (_repository.Reservation.GetReservationsByUser(id).Any())
                 {
-                    _logger.LogError($"Cannot delete user with id: {id}. It has related reservations. Delete those resrevations first");
+                    _logger.LogError($"Cannot delete user with id: {id}. It has related reservations. Delete those reservations first");
                     return BadRequest("Cannot delete user. It has related reservations. Delete those reservations first");
                 }
 
@@ -193,18 +248,5 @@ namespace BeautySalon.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
-        //[AllowAnonymous]
-        //[HttpPost("authenticate")]
-        //public IActionResult Authenticate([FromBody]User userParam)
-        //{
-        //    if (userParam == null) return BadRequest("Invalid client request");
-
-        //    var user = _repository.User.Authenticate(userParam.Email, userParam.Password, _secret);
-
-        //    if (user == null) return Unauthorized();
-
-        //    return Ok(user);
-        //}
     }
 }

@@ -12,6 +12,8 @@ namespace Entities.ExtendedModels
         public int MasterId { get; set; }
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
+        public Boolean ApprovedByUser { get; set; }
+        public string Status { get; set; }
 
         public IEnumerable<Service> Services { get; set; }
 

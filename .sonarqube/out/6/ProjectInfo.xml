@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sonarsource.com/msbuild/integration/2015/1">
+  <ProjectName>XUnitTests</ProjectName>
+  <ProjectLanguage>C#</ProjectLanguage>
+  <ProjectType>Test</ProjectType>
+  <ProjectGuid>9f7cd150-ffef-4478-90d0-85cc0af5eb17</ProjectGuid>
+  <FullPath>C:\Users\Kamile\source\repos\BeautySalon\XUnitTests\XUnitTests.csproj</FullPath>
+  <IsExcluded>false</IsExcluded>
+  <AnalysisResults>
+    <AnalysisResult Id="FilesToAnalyze" Location="C:\Users\Kamile\source\repos\BeautySalon\.sonarqube\out\6\FilesToAnalyze.txt" />
+  </AnalysisResults>
+  <AnalysisSettings>
+    <Property Name="sonar.cs.roslyn.reportFilePath">C:\Users\Kamile\source\repos\BeautySalon\XUnitTests\bin\Debug\netcoreapp2.1\XUnitTests.dll.RoslynCA.json|C:\Users\Kamile\source\repos\BeautySalon\XUnitTests\bin\Debug\netcoreapp2.1\XUnitTests.dll.RoslynCA.json</Property>
+    <Property Name="sonar.cs.analyzer.projectOutPath">C:\Users\Kamile\source\repos\BeautySalon\.sonarqube\out\6</Property>
+  </AnalysisSettings>
+  <Configuration>Debug</Configuration>
+  <Platform>AnyCPU</Platform>
+  <TargetFramework>netcoreapp2.1</TargetFramework>
+</ProjectInfo>

@@ -11,7 +11,7 @@ namespace Entities.ExtendedModels
         public int MasterId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime Time { get; set; }
+        public TimeSpan Time { get; set; }
 
         public IEnumerable<Reservation> Reservations { get; set; }
 

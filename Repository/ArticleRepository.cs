@@ -23,6 +23,11 @@ namespace Repository
             return FindAll().OrderBy(x => x.Id).ToList();
         }
 
+        public IEnumerable<Article> GetArticlesByMaster(int masterId)
+        {
+            return FindByCondition(article => article.UserId.Equals(masterId)).ToList();
+        }
+
         [HttpGet("{id}", Name = nameof(GetArticleById))]
         public Article GetArticleById(int articleId)
         {

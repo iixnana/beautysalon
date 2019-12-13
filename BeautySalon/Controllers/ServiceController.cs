@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Contracts;
 using Entities.Models;
 using Entities.Extentsions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeautySalon.Controllers
 {
@@ -15,11 +16,13 @@ namespace BeautySalon.Controllers
     {
         private ILoggerManager _logger;
         private IRepositoryWrapper _repository;
+        private readonly IAuthService _authService;
 
-        public ServiceController(ILoggerManager logger, IRepositoryWrapper repository)
+        public ServiceController(ILoggerManager logger, IRepositoryWrapper repository, IAuthService authService)
         {
             _logger = logger;
             _repository = repository;
+            _authService = authService;
         }
 
         [HttpGet]
@@ -65,6 +68,25 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("master/{id}")]
+        public IActionResult GetServicesByMaster(int id)
+        {
+            try
+            {
+                var services = _repository.Service.GetServicesByMaster(id);
+
+                _logger.LogInfo($"Returned services with master id: {id}");
+                return Ok(services);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetServiceById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [Authorize(Roles = Role.Master)]
         [HttpPost]
         public IActionResult CreateService([FromBody]Service service)
         {
@@ -75,6 +97,12 @@ namespace BeautySalon.Controllers
                 {
                     _logger.LogError("Service object sent from client is null.");
                     return BadRequest("Service object is null");
+                }
+
+                if (_authService.GetId(Request.Headers["Authorization"]) != service.MasterId)
+                {
+                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in CreateService.");
+                    return Unauthorized();
                 }
 
                 if (!ModelState.IsValid)
@@ -97,6 +125,7 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.MasterAdmin)]
         [HttpPut("{id}")]
         public IActionResult UpdateService(int id, [FromBody]Service service)
         {
@@ -106,6 +135,12 @@ namespace BeautySalon.Controllers
                 {
                     _logger.LogError("Service object sent from client is null.");
                     return BadRequest("Service object is null");
+                }
+
+                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != service.MasterId)
+                {
+                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in UpdateService.");
+                    return Unauthorized();
                 }
 
                 if (!ModelState.IsValid)
@@ -133,12 +168,20 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.MasterAdmin)]
         [HttpDelete("{id}")]
         public IActionResult DeleteService(int id)
         {
             try
             {
                 var service = _repository.Service.GetServiceById(id);
+
+                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != service.MasterId)
+                {
+                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in CreateService.");
+                    return Unauthorized();
+                }
+
                 if (service.IsEmptyObject(id))
                 {
                     _logger.LogError($"Service with id: {id}, hasn't been found in db.");

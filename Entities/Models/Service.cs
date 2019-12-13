@@ -21,6 +21,6 @@ namespace Entities.Models
         public string Description { get; set; }
 
         [Required]
-        public DateTime Time { get; set; }
+        public TimeSpan Time { get; set; }
     }
 }

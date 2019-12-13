@@ -19,9 +19,9 @@ namespace Entities.Models
         public DateTime Date { get; set; }
 
         [Required]
-        public DateTime TimeStart { get; set; }
+        public TimeSpan TimeStart { get; set; }
 
         [Required]
-        public DateTime TimeEnd { get; set; }
+        public TimeSpan TimeEnd { get; set; }
     }
 }

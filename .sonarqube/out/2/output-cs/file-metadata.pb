@@ -1,0 +1,13 @@
+Q
+HC:\Users\Kamile\source\repos\BeautySalon\Contracts\IArticleRepository.csutf-8K
+BC:\Users\Kamile\source\repos\BeautySalon\Contracts\IAuthService.csutf-8M
+DC:\Users\Kamile\source\repos\BeautySalon\Contracts\ILoggerManager.csutf-8N
+EC:\Users\Kamile\source\repos\BeautySalon\Contracts\IRepositoryBase.csutf-8Q
+HC:\Users\Kamile\source\repos\BeautySalon\Contracts\IRepositoryWrapper.csutf-8`
+WC:\Users\Kamile\source\repos\BeautySalon\Contracts\IReservationHasServicesRepository.csutf-8U
+LC:\Users\Kamile\source\repos\BeautySalon\Contracts\IReservationRepository.csutf-8Q
+HC:\Users\Kamile\source\repos\BeautySalon\Contracts\IServiceRepository.csutf-8S
+JC:\Users\Kamile\source\repos\BeautySalon\Contracts\ITimetableRepository.csutf-8N
+EC:\Users\Kamile\source\repos\BeautySalon\Contracts\IUserRepository.csutf-8\
+QC:\Users\Kamile\AppData\Local\Temp\.NETCoreApp,Version=v2.1.AssemblyAttributes.csutf-8o
+dC:\Users\Kamile\source\repos\BeautySalon\Contracts\obj\Debug\netcoreapp2.1\Contracts.AssemblyInfo.csutf-8

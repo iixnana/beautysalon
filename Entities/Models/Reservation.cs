@@ -23,5 +23,17 @@ namespace Entities.Models
 
         [Required]
         public DateTime TimeEnd { get; set; }
+
+        [Required]
+        public Boolean ApprovedByUser { get; set; }
+
+        public string Status { get; set; }
+    }
+
+    public enum StatusEnum
+    {
+        Approved,
+        Waiting,
+        Canceled
     }
 }

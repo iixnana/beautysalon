@@ -17,7 +17,7 @@ namespace Entities.Models
         public DateTime CreationDate { get; set; }
 
         [Required]
-        public int UserType { get; set; }
+        public string UserType { get; set; }
 
         [Required(ErrorMessage = "First name is required")]
         [StringLength(30, ErrorMessage = "Name can't be longer than 30 characters")]
@@ -38,15 +38,17 @@ namespace Entities.Models
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
 
-        public string Token { get; set; }
-
 
     }
 
-    public enum Type
+    public static class Role
     {
-        Client = 0,
-        Master = 1,
-        Admin = 2
+        public const string Client = "Client";
+        public const string Master = "Master";
+        public const string Admin = "Admin";
+        public const string ClientMasterAdmin = "Client, Master, Admin";
+        public const string ClientMaster = "Client, Master";
+        public const string ClientAdmin = "Client, Admin";
+        public const string MasterAdmin = "Master, Admin";
     }
 }

@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Contracts;
 using Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeautySalon
 {
@@ -126,6 +127,7 @@ namespace BeautySalon
             app.UseStaticFiles();
 
             app.UseAuthentication();
+            
 
             app.UseMvc();
         }

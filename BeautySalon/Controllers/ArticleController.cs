@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Contracts;
 using Entities.Models;
 using Entities.Extentsions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeautySalon.Controllers
 {
@@ -15,13 +16,16 @@ namespace BeautySalon.Controllers
     {
         private ILoggerManager _logger;
         private IRepositoryWrapper _repository;
+        private readonly IAuthService _authService;
 
-        public ArticleController(ILoggerManager logger, IRepositoryWrapper repository)
+        public ArticleController(ILoggerManager logger, IRepositoryWrapper repository, IAuthService authService)
         {
             _logger = logger;
             _repository = repository;
+            _authService = authService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult GetAllArticles()
         {
@@ -40,6 +44,26 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("author/{id}")]
+        public IActionResult GetArticlesByAuthor(int id)
+        {
+            try
+            {
+                var articles = _repository.Article.GetArticlesByMaster(id);
+
+                _logger.LogInfo($"Returned all articles from database.");
+
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetAllArticles action: {ex.Message}");
+                return NotFound();
+            }
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public IActionResult GetArticleById(int id)
         {
@@ -65,6 +89,7 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.Master)]
         [HttpPost]
         public IActionResult CreateArticle([FromBody]Article article)
         {
@@ -75,6 +100,12 @@ namespace BeautySalon.Controllers
                 {
                     _logger.LogError("Article object sent from client is null.");
                     return BadRequest("Article object is null");
+                }
+
+                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != article.UserId)
+                {
+                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in CreateArticle.");
+                    return Unauthorized();
                 }
 
                 if (!ModelState.IsValid)
@@ -97,6 +128,7 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.MasterAdmin)]
         [HttpPut("{id}")]
         public IActionResult UpdateArticle(int id, [FromBody]Article article)
         {
@@ -106,6 +138,12 @@ namespace BeautySalon.Controllers
                 {
                     _logger.LogError("Article object sent from client is null.");
                     return BadRequest("Article object is null");
+                }
+
+                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != article.UserId)
+                {
+                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in UpdateArticle.");
+                    return Unauthorized();
                 }
 
                 if (!ModelState.IsValid)
@@ -133,6 +171,7 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.MasterAdmin)]
         [HttpDelete("{id}")]
         public IActionResult DeleteArticle(int id)
         {
@@ -145,11 +184,11 @@ namespace BeautySalon.Controllers
                     return NotFound();
                 }
 
-                //if (_repository.Reservation.ReservationsByArticle(id).Any())
-                //{
-                //    _logger.LogError($"Cannot delete article with id: {id}. It has related reservations. Delete those resrevations first");
-                //    return BadRequest("Cannot delete article. It has related reservations. Delete those reservations first");
-                //}
+                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != article.UserId)
+                {
+                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in DeleteArticle.");
+                    return Unauthorized();
+                }
 
                 _repository.Article.DeleteArticle(article);
                 _repository.Save();

@@ -33,12 +33,34 @@ namespace Repository
             return FindByCondition(user => user.Id.Equals(userId)).DefaultIfEmpty(new User()).FirstOrDefault();
         }
 
+        public User GetUserByEmail(string email)
+        {
+            return FindByCondition(user => user.Email.Equals(email)).DefaultIfEmpty(new User()).FirstOrDefault();
+        }
+
         public UserExtended GetUserWithDetails(int userId)
         {
             return new UserExtended(GetUserById(userId))
             {
                 Reservations = RepositoryContext.Reservations.Where(a => a.UserId == userId)
             };
+        }
+
+        public IEnumerable<User> GetAllMasters()
+        {
+            return FindByCondition(user => user.UserType.Equals("Master")).ToList();
+        }
+
+
+        public IEnumerable<User> GetAllClients()
+        {
+            return FindByCondition(user => user.UserType.Equals("Client")).ToList();
+        }
+
+
+        public IEnumerable<User> GetAllAdmins()
+        {
+            return FindByCondition(user => user.UserType.Equals("Admins")).ToList();
         }
 
         public void CreateUser(User user)
@@ -65,31 +87,6 @@ namespace Repository
             return true;
         }
 
-        //public User Authenticate(string email, string password, string secret)
-        //{
-        //    var user = FindByCondition(x => x.Email.Equals(email) && x.Password.Equals(password)).DefaultIfEmpty(null).FirstOrDefault();
-        //    if (user.IsObjectNull()) return null; //not found
-
-        //    //auth
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(secret);
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new Claim[]
-        //        {
-        //            new Claim(ClaimTypes.Name, user.Id.ToString())
-        //        }),
-        //        Expires = DateTime.UtcNow.AddDays(3),
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        //    };
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    user.Token = tokenHandler.WriteToken(token);
-
-        //    // remove password before returning
-        //    user.Password = null;
-
-        //    return user;
-        //}
 
         private string ComputeSha256Hash(string rawData)
         {

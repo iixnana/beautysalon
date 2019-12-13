@@ -27,10 +27,11 @@ namespace Repository
         {
             token = string.Empty;
             if (!_userRep.IsValidUser(request.Email, request.Password)) return false;
-
+            User user = _userRep.GetUserByEmail(request.Email);
             var claim = new[]
             {
-                new Claim(ClaimTypes.Name, request.Email)
+                new Claim(ClaimTypes.Email, request.Email),
+                new Claim(ClaimTypes.Role, user.UserType)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Secret));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -44,7 +45,53 @@ namespace Repository
             );
             token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             return true;
-
         }
+
+
+        public JwtSecurityToken ReadToken(string header)
+        {
+            var actualToken = (header.Split(' '))[1];
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(actualToken);
+            return token;
+        }
+
+        public bool IsAdmin(string header)
+        {
+            var token = ReadToken(header);
+            if(token.Payload[ClaimTypes.Role].Equals("Admin"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsMaster(string header)
+        {
+            var token = ReadToken(header);
+            if (token.Payload[ClaimTypes.Role].Equals("Master"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsClient(string header)
+        {
+            var token = ReadToken(header);
+            if (token.Payload[ClaimTypes.Role].Equals("Client"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public int GetId(string header)
+        {
+            var token = ReadToken(header);
+            User user = _userRep.GetUserByEmail(token.Payload[ClaimTypes.Email].ToString());
+            return user.Id;
+        }
+
     }
 }

@@ -8,6 +8,7 @@ namespace Contracts
     public interface IArticleRepository : IRepositoryBase<Article>
     {
         IEnumerable<Article> GetAllArticles();
+        IEnumerable<Article> GetArticlesByMaster(int masterId);
         Article GetArticleById(int articleId);
         void CreateArticle(Article article);
         void UpdateArticle(Article dbArticle, Article article);

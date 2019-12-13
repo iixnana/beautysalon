@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts;
@@ -15,25 +16,52 @@ namespace BeautySalon.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private ILoggerManager _logger;
+        public AuthController(ILoggerManager logger, IAuthService authService)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         [AllowAnonymous]
         [HttpPost, Route("request")]
-        public ActionResult RequestToken([FromBody]AuthData request)
+        public IActionResult RequestToken([FromBody]AuthData request)
         {
-            if (request == null) return BadRequest("Invalid client request");
-
-            string token;
-            if (_authService.IsAuthenticated(request, out token))
+            try
             {
-                return Ok(token);
+                if (request == null) return BadRequest("Invalid client request");
+
+                string token;
+                if (_authService.IsAuthenticated(request, out token))
+                {
+                    _logger.LogInfo($"Token generated.");
+                    return Ok(token);
+                }
+                _logger.LogInfo($"Invalid data.");
+                return Unauthorized();
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside RequestToken method: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
-            return BadRequest("Invalid Request");
-
+        [HttpGet]
+        public IActionResult ReadToken()
+        {
+            try
+            {
+                string receivedToken = Request.Headers["Authorization"];
+                var token = _authService.ReadToken(receivedToken);
+                _logger.LogInfo($"Authorized token.");
+                return Ok(token.Payload);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Bad token: {ex.Message} {Request.Headers["Authorization"]}");
+                return Unauthorized();
+            }
         }
     }
 }

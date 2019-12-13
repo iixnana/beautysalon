@@ -10,6 +10,7 @@ namespace Contracts
         IEnumerable<Service> ServicesByReservation(int masterId);
         IEnumerable<Service> GetAllServices();
         Service GetServiceById(int serviceId);
+        IEnumerable<Service> GetServicesByMaster(int masterId);
         void CreateService(Service service);
         void UpdateService(Service dbService, Service service);
         void DeleteService(Service service);

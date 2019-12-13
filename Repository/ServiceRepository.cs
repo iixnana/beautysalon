@@ -34,10 +34,16 @@ namespace Repository
             return FindByCondition(service => service.Id.Equals(serviceId)).DefaultIfEmpty(new Service()).FirstOrDefault();
         }
 
+        public IEnumerable<Service> GetServicesByMaster(int masterId)
+        {
+            return FindByCondition(service => service.MasterId.Equals(masterId)).ToList();
+        }
+
         public void CreateService(Service service)
         {
             Create(service);
         }
+
 
         public void UpdateService(Service dbService, Service service)
         {

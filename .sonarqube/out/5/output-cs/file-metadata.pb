@@ -1,0 +1,15 @@
+^
+UC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\ArticleController.csutf-8[
+RC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\AuthController.csutf-8b
+YC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\ReservationController.csutf-8^
+UC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\ServiceController.csutf-8`
+WC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\TimetableController.csutf-8[
+RC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\UserController.csutf-8]
+TC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Controllers\ValuesController.csutf-8]
+TC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Extensions\ServiceExtensions.csutf-8H
+?C:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Program.csutf-8H
+?C:\Users\Kamile\source\repos\BeautySalon\BeautySalon\Startup.csutf-8\
+QC:\Users\Kamile\AppData\Local\Temp\.NETCoreApp,Version=v2.1.AssemblyAttributes.csutf-8x
+mC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\obj\Debug\netcoreapp2.1\BeautySalon.RazorAssemblyInfo.csutf-8r
+gC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.csutf-8s
+hC:\Users\Kamile\source\repos\BeautySalon\BeautySalon\obj\Debug\netcoreapp2.1\BeautySalon.AssemblyInfo.csutf-8
