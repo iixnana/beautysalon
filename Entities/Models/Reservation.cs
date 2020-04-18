@@ -25,15 +25,9 @@ namespace Entities.Models
         public DateTime TimeEnd { get; set; }
 
         [Required]
-        public Boolean ApprovedByUser { get; set; }
+        public int ServiceId { get; set; }
 
-        public string Status { get; set; }
-    }
-
-    public enum StatusEnum
-    {
-        Approved,
-        Waiting,
-        Canceled
+        [Required]
+        public int TimetableId { get; set; }
     }
 }

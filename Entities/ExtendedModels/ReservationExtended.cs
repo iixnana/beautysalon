@@ -12,10 +12,13 @@ namespace Entities.ExtendedModels
         public int MasterId { get; set; }
         public DateTime TimeStart { get; set; }
         public DateTime TimeEnd { get; set; }
-        public Boolean ApprovedByUser { get; set; }
-        public string Status { get; set; }
+        public int ServiceId { get; set; }
+        public int TimetableId { get; set; }
 
-        public IEnumerable<Service> Services { get; set; }
+        public Service Service { get; set; }
+        public User Master { get; set; }
+        public User User { get; set; }
+        public Timetable Timetable { get; set; }
 
         public ReservationExtended()
         {
@@ -29,6 +32,7 @@ namespace Entities.ExtendedModels
             MasterId = reservation.MasterId;
             TimeStart = reservation.TimeStart;
             TimeEnd = reservation.TimeEnd;
+            ServiceId = reservation.ServiceId;
         }
 
     }

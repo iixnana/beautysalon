@@ -142,18 +142,13 @@ namespace BeautySalon.Controllers
         {
             try
             {
-                //user.CreationDate = DateTime.UtcNow;
                 if (user.IsObjectNull())
                 {
                     _logger.LogError("User object sent from client is null.");
                     return BadRequest("User object is null");
                 }
-
-                if (!ModelState.IsValid)
-                {
-                    _logger.LogError("Invalid user object sent from client.");
-                    return BadRequest("Invalid model object");
-                }
+                if (user.UserType == null) user.UserType = "Client";
+                user.CreationDate = DateTime.UtcNow;
 
                 _repository.User.CreateUser(user);
                 _repository.Save();
@@ -187,19 +182,21 @@ namespace BeautySalon.Controllers
                     return BadRequest("User object is null");
                 }
 
-                if (!ModelState.IsValid)
-                {
-                    _logger.LogError("Invalid user object sent from client.");
-                    return BadRequest("Invalid model object");
-                }
+
 
                 var dbUser = _repository.User.GetUserById(id);
+                if (user.Password == "")
+                {
+                    user.Password = dbUser.Password;
+                }
                 if (dbUser.IsEmptyObject(id))
                 {
                     _logger.LogError($"User with id: {id}, hasn't been found in db.");
                     return NotFound();
                 }
                 user.Id = id;
+                user.UserType = dbUser.UserType;
+
                 _repository.User.UpdateUser(dbUser, user);
                 _repository.Save();
 
@@ -229,12 +226,6 @@ namespace BeautySalon.Controllers
                 {
                     _logger.LogError($"User with id: {id}, hasn't been found in db.");
                     return NotFound();
-                }
-
-                if (_repository.Reservation.GetReservationsByUser(id).Any())
-                {
-                    _logger.LogError($"Cannot delete user with id: {id}. It has related reservations. Delete those reservations first");
-                    return BadRequest("Cannot delete user. It has related reservations. Delete those reservations first");
                 }
 
                 _repository.User.DeleteUser(user);

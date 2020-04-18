@@ -31,7 +31,9 @@ namespace Repository
             var claim = new[]
             {
                 new Claim(ClaimTypes.Email, request.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.UserType)
+
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Secret));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

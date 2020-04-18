@@ -52,7 +52,32 @@ namespace BeautySalon.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = Role.Master)]
+        [HttpGet("timetable/{id}")]
+        public IActionResult GetReservationsByTimetable(int id)
+        {
+            try
+            {
+                var reservations = _repository.Reservation.GetReservationsByTimetable(id);
+                if (reservations.Any())
+                {
+                    _logger.LogInfo($"Returned all reservations from database.");
+
+                    return Ok(reservations);
+                }
+                else
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetReservationsByTimetable action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [Authorize(Roles = Role.Master)]
         [HttpGet("master/{id}")]
         public IActionResult GetReservationsByMaster(int id)
         {
@@ -111,7 +136,7 @@ namespace BeautySalon.Controllers
 
 
         // GET api/<controller>/5
-        [Authorize(Roles = Role.ClientMasterAdmin)]
+        [Authorize(Roles = Role.ClientMaster)]
         [HttpGet("{id}")]
         public IActionResult GetReservationById(int id)
         {
@@ -149,6 +174,84 @@ namespace BeautySalon.Controllers
             }
         }
 
+        [Authorize(Roles = Role.ClientMasterAdmin)]
+        [HttpGet("details/{id}")]
+        public IActionResult GetReservationWithDetails(int id)
+        {
+            try
+            {
+                var reservation = _repository.Reservation.GetReservationWithDetails(id);
+
+                if (reservation.IsEmptyObject(id))
+                {
+                    _logger.LogError($"Reservation with id: {id}, hasn't been found in db.");
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogInfo($"Returned reservation with details for id: {id}");
+                    return Ok(reservation);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetReservationWithDetails action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [Authorize(Roles = Role.MasterAdmin)]
+        [HttpGet("details")]
+        public IActionResult GetReservationsWithDetails()
+        {
+            try
+            {
+                var reservations = _repository.Reservation.GetReservationsWithDetails();
+
+                if (!reservations.Any())
+                {
+                    _logger.LogError($"No reservations have been found in db.");
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogInfo($"Returned extended reservations");
+                    return Ok(reservations);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetReservationsWithDetails action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [Authorize(Roles = Role.ClientMasterAdmin)]
+        [HttpGet("details/user/{id}")]
+        public IActionResult GetReservationsWithDetails(int id)
+        {
+            try
+            {
+                var reservations = _repository.Reservation.GetReservationsWithDetails(id);
+
+                if (!reservations.Any())
+                {
+                    _logger.LogError($"No reservations have been found in db.");
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogInfo($"Returned extended reservations");
+                    return Ok(reservations);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetReservationsWithDetails action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         // POST api/<controller>
         [Authorize(Roles = Role.Client)]
         [HttpPost]
@@ -156,27 +259,15 @@ namespace BeautySalon.Controllers
         {
             try
             {
-                var IdFromToken = _authService.GetId(Request.Headers["Authorization"]);
-                if (IdFromToken != reservation.UserId)
-                {
-                    _logger.LogError($"User with id: {IdFromToken}, has tried to create reservation for user {reservation.UserId}.");
-                    return Unauthorized();
-                }
-                reservation.Status = "Waiting";
-                reservation.ApprovedByUser = false;
+                reservation.UserId = _authService.GetId(Request.Headers["Authorization"]);
+                var timetable = _repository.Timetable.GetTimetableByMasterAndDateTime(reservation.MasterId, reservation.TimeStart.Date, reservation.TimeStart.TimeOfDay, reservation.TimeEnd.TimeOfDay);
+                reservation.TimetableId = timetable.Id;
+                
 
                 if (reservation.IsObjectNull())
                 {
                     _logger.LogError("Reservation object sent from client is null.");
                     return BadRequest("Reservation object is null");
-                }
-
-                if (!ModelState.IsValid || reservation.TimeStart.Date != reservation.TimeEnd.Date
-                    || _repository.Timetable.GetTimetableByMasterAndDateTime(reservation.MasterId, reservation.TimeStart.Date, reservation.TimeStart.TimeOfDay, reservation.TimeEnd.TimeOfDay).IsObjectNull()
-                    || !_repository.Reservation.IsValid(reservation.MasterId, reservation.TimeStart.Date, reservation.TimeStart.TimeOfDay, reservation.TimeEnd.TimeOfDay))
-                {
-                    _logger.LogError("Invalid reservation object sent from client.");
-                    return BadRequest("Invalid model object");
                 }
 
                 _repository.Reservation.CreateReservation(reservation);
@@ -238,7 +329,7 @@ namespace BeautySalon.Controllers
         }
 
         // DELETE api/<controller>/5
-        [Authorize(Roles = Role.Client)]
+        [Authorize(Roles = Role.ClientMaster)]
         [HttpDelete("{id}")]
         public IActionResult DeleteReservation(int id)
         {
@@ -249,12 +340,6 @@ namespace BeautySalon.Controllers
                 {
                     _logger.LogError($"Reservation with id: {id}, hasn't been found in db.");
                     return NotFound();
-                }
-
-                if (_authService.GetId(Request.Headers["Authorization"]) != reservation.UserId)
-                {
-                    _logger.LogError($"User with id: {id}, has tried to access restricted data in DeleteReservation.");
-                    return Unauthorized();
                 }
 
                 _repository.Reservation.DeleteReservation(reservation);

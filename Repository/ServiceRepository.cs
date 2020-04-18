@@ -34,9 +34,36 @@ namespace Repository
             return FindByCondition(service => service.Id.Equals(serviceId)).DefaultIfEmpty(new Service()).FirstOrDefault();
         }
 
-        public IEnumerable<Service> GetServicesByMaster(int masterId)
+        public ServiceExtended GetServiceWithDetails(int id)
         {
-            return FindByCondition(service => service.MasterId.Equals(masterId)).ToList();
+            Service service = GetServiceById(id);
+            return new ServiceExtended(service)
+            {
+                Reservations = RepositoryContext.Reservations.Where(x => x.ServiceId == service.Id),
+                Master = RepositoryContext.Users.FirstOrDefault(x => x.Id == service.MasterId)
+            };
+        }
+
+        public IEnumerable<ServiceExtended> GetServicesWithDetails()
+        {
+            IEnumerable<Service> services = GetAllServices();
+            List<ServiceExtended> detailedServices = new List<ServiceExtended>();
+            foreach (Service service in services)
+            {
+                detailedServices.Add(GetServiceWithDetails(service.Id));
+            }
+            return detailedServices;
+        }
+
+        public IEnumerable<ServiceExtended> GetServicesByMaster(int masterId)
+        {
+            IEnumerable<Service> services = FindByCondition(service => service.MasterId.Equals(masterId)).ToList();
+            List<ServiceExtended> detailedServices = new List<ServiceExtended>();
+            foreach (Service service in services)
+            {
+                detailedServices.Add(GetServiceWithDetails(service.Id));
+            }
+            return detailedServices;
         }
 
         public void CreateService(Service service)

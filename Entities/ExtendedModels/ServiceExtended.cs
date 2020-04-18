@@ -14,6 +14,7 @@ namespace Entities.ExtendedModels
         public TimeSpan Time { get; set; }
 
         public IEnumerable<Reservation> Reservations { get; set; }
+        public User Master { get; set; }
 
         public ServiceExtended()
         {

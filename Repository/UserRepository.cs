@@ -42,7 +42,10 @@ namespace Repository
         {
             return new UserExtended(GetUserById(userId))
             {
-                Reservations = RepositoryContext.Reservations.Where(a => a.UserId == userId)
+                Reservations = RepositoryContext.Reservations.Where(a => a.UserId == userId),
+                Services = RepositoryContext.Services.Where(a => a.MasterId == userId),
+                Timetables = RepositoryContext.Timetables.Where(a => a.MasterId == userId),
+                Articles = RepositoryContext.Articles.Where(a => a.UserId == userId)
             };
         }
 

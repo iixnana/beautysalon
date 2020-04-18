@@ -102,18 +102,12 @@ namespace BeautySalon.Controllers
                     return BadRequest("Article object is null");
                 }
 
-                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != article.UserId)
-                {
-                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in CreateArticle.");
-                    return Unauthorized();
-                }
-
                 if (!ModelState.IsValid)
                 {
                     _logger.LogError("Invalid article object sent from client.");
                     return BadRequest("Invalid model object");
                 }
-
+                article.UserId = _authService.GetId(Request.Headers["Authorization"]);
                 _repository.Article.CreateArticle(article);
                 _repository.Save();
 
@@ -128,7 +122,7 @@ namespace BeautySalon.Controllers
             }
         }
 
-        [Authorize(Roles = Role.MasterAdmin)]
+        [Authorize(Roles = Role.Master)]
         [HttpPut("{id}")]
         public IActionResult UpdateArticle(int id, [FromBody]Article article)
         {
@@ -140,11 +134,7 @@ namespace BeautySalon.Controllers
                     return BadRequest("Article object is null");
                 }
 
-                if (_authService.IsMaster(Request.Headers["Authorization"]) && _authService.GetId(Request.Headers["Authorization"]) != article.UserId)
-                {
-                    _logger.LogError($"User with id: {_authService.GetId(Request.Headers["Authorization"])}, has tried to access restricted data in UpdateArticle.");
-                    return Unauthorized();
-                }
+
 
                 if (!ModelState.IsValid)
                 {
@@ -159,9 +149,12 @@ namespace BeautySalon.Controllers
                     return NotFound();
                 }
 
+                article.Id = dbArticle.Id;
+                article.UserId = dbArticle.UserId;
+                article.PublishingTime = dbArticle.PublishingTime;
                 _repository.Article.UpdateArticle(dbArticle, article);
                 _repository.Save();
-
+                _logger.LogInfo($"Article with id: {id}, has been updated in db.");
                 return NoContent();
             }
             catch (Exception ex)
@@ -171,7 +164,7 @@ namespace BeautySalon.Controllers
             }
         }
 
-        [Authorize(Roles = Role.MasterAdmin)]
+        [Authorize(Roles = Role.Master)]
         [HttpDelete("{id}")]
         public IActionResult DeleteArticle(int id)
         {

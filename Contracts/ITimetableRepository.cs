@@ -16,5 +16,6 @@ namespace Contracts
         void CreateTimetable(Timetable timetable);
         void UpdateTimetable(Timetable dbTimetable, Timetable timetable);
         void DeleteTimetable(Timetable timetable);
+        List<DateTime[]> GetTimes(int masterId, int serviceId);
     }
 }

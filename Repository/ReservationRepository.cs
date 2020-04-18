@@ -30,8 +30,20 @@ namespace Repository
 
         public IEnumerable<Reservation> ReservationsByTimetable(DateTime date, TimeSpan start, TimeSpan end)
         {
-            return FindByCondition(a => a.TimeStart.Date.Equals(date) && a.TimeStart.TimeOfDay >= start && a.TimeEnd.TimeOfDay <= end && a.Status != "Approved").ToList();
+            return FindByCondition(a => a.TimeStart.Date.Equals(date) && a.TimeStart.TimeOfDay >= start && a.TimeEnd.TimeOfDay <= end).ToList();
         }
+
+        public IEnumerable<ReservationExtended> GetReservationsByTimetable(int id)
+        {
+            IEnumerable<Reservation> reservations = FindByCondition(a => a.TimetableId == id).ToList(); ;
+            List<ReservationExtended> detailedReservations = new List<ReservationExtended>();
+            foreach (Reservation reservation in reservations)
+            {
+                detailedReservations.Add(GetReservationWithDetails(reservation.Id));
+            }
+            return detailedReservations;
+        }
+
 
         public IEnumerable<Reservation> GetReservationsByMaster(int masterId)
         {
@@ -47,6 +59,40 @@ namespace Repository
         public Reservation GetReservationById(int reservationId)
         {
             return FindByCondition(reservation => reservation.Id.Equals(reservationId)).DefaultIfEmpty(new Reservation()).FirstOrDefault();
+        }
+
+        public ReservationExtended GetReservationWithDetails(int id)
+        {
+            Reservation reservation = GetReservationById(id);
+            return new ReservationExtended(reservation)
+            {
+                Service = RepositoryContext.Services.FirstOrDefault(x => x.Id == reservation.ServiceId),
+                Master = RepositoryContext.Users.FirstOrDefault(x => x.Id == reservation.MasterId),
+                User = RepositoryContext.Users.FirstOrDefault(x => x.Id == reservation.UserId),
+                Timetable = RepositoryContext.Timetables.FirstOrDefault(x => x.Id == reservation.TimetableId)
+            };
+        }
+
+        public IEnumerable<ReservationExtended> GetReservationsWithDetails()
+        {
+            IEnumerable<Reservation> reservations = GetAllReservations();
+            List<ReservationExtended> detailedReservations = new List<ReservationExtended>();
+            foreach (Reservation reservation in reservations)
+            {
+                detailedReservations.Add(GetReservationWithDetails(reservation.Id));
+            }
+            return detailedReservations;
+        }
+
+        public IEnumerable<ReservationExtended> GetReservationsWithDetails(int userId)
+        {
+            IEnumerable<Reservation> reservations = FindByCondition(a => a.UserId == userId).ToList();
+            List<ReservationExtended> detailedReservations = new List<ReservationExtended>();
+            foreach (Reservation reservation in reservations)
+            {
+                detailedReservations.Add(GetReservationWithDetails(reservation.Id));
+            }
+            return detailedReservations;
         }
 
         public bool IsValid(int masterId, DateTime date, TimeSpan start, TimeSpan end)

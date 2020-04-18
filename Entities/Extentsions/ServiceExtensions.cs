@@ -9,8 +9,8 @@ namespace Entities.Extentsions
     {
         public static void Map(this Service dbService, Service service)
         {
-            dbService.Id = service.Id;
-            dbService.MasterId = service.MasterId;
+            //dbService.Id = service.Id;
+            //dbService.MasterId = service.MasterId;
             dbService.Title = service.Title;
             dbService.Time = service.Time;
             dbService.Description = service.Description;

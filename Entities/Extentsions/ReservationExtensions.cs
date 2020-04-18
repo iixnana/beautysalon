@@ -14,8 +14,8 @@ namespace Entities.Extentsions
             dbReservation.UserId = reservation.UserId;
             dbReservation.TimeStart = reservation.TimeStart;
             dbReservation.TimeEnd = reservation.TimeEnd;
-            dbReservation.ApprovedByUser = reservation.ApprovedByUser;
-            dbReservation.Status = reservation.Status;
+            dbReservation.ServiceId = reservation.ServiceId;
+            dbReservation.TimetableId = reservation.TimetableId;
         }
     }
 }

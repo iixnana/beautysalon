@@ -14,6 +14,6 @@ namespace Entities
         public DbSet<Timetable> Timetables { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<Article> News { get; set; }
+        public DbSet<Article> Articles { get; set; }
     }
 }
